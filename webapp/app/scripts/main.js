@@ -100,38 +100,8 @@ function setupActions(device) {
     $('#actions').show();
 }
 
-function setupDevice(device) {
+function setupDevice() {
     // Peform setup for device
-    getSettings(device);
-    setupActions(device);
-}
-
-$(function () {
-    // Attempt login using stored access token
-    var access_token = window.localStorage['access_token'];
-
-    if (access_token != null) {
-        console.log('Logging in using access token:', access_token);
-
-        // Weird; in the docs this should be access_token
-        spark.login({accessToken: access_token});
-    } else {
-        // Display login button
-        console.log('Rendering login button');
-
-        sparkLogin(function (data) {
-            console.log('Logged in:', data);
-
-            // Hide login button
-            $('#spark-login').hide();
-
-            // Store access token
-            window.localStorage['access_token'] = data.access_token;
-        });
-    }
-});
-
-spark.on('login', function() {
     var devicesPr = spark.listDevices();
 
     devicesPr.then(
@@ -147,10 +117,41 @@ spark.on('login', function() {
             console.log('- version: ' + device.version);
             console.log('- requires upgrade?: ' + device.requiresUpgrade);
 
-            setupDevice(device);
+            getSettings(device);
+            setupActions(device);
         },
         function(err) {
             console.log('List devices call failed: ', err);
         }
     );
+}
+
+function getDevice() {
+
+}
+
+$(function () {
+    // Attempt login using stored access token
+    var access_token = window.localStorage['access_token'];
+
+    if (access_token != null) {
+        console.log('Logging in using access token:', access_token);
+
+        // Weird; in the docs this should be access_token
+        spark.login({accessToken: access_token}).then(setupDevice);
+    } else {
+        // Display login button
+        sparkLogin(function (data) {
+            console.log('Logged in:', data);
+
+            // Hide login button
+            $('#spark-login').hide();
+
+            // Store access token
+            window.localStorage['access_token'] = data.access_token;
+
+            spark.login({accessToken: data.access_token}).then(setupDevice);
+        });
+    }
 });
+
