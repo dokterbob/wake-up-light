@@ -3,7 +3,8 @@
   "private": true,
   "dependencies": {
     "jquery": "~1.10.2",
-    "spark": "~0.2.1"
+    "spark": "~0.2.1",
+    "lodash": "~2.4.1"
   },
   "devDependencies": {}
 }

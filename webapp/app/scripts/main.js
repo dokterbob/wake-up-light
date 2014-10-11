@@ -23,7 +23,7 @@ function getSettings(device) {
             console.log('An error occurred:', err);
         } else {
             console.log('Function called succesfully:', data);
-            $('#duration').text(data.result/60);
+            $('#duration').text(data.result/60000);
         }
     });
 
@@ -39,6 +39,28 @@ function getSettings(device) {
             }
         }
     });
+
+    $('#hour').on('input', _.throttle(function () {
+        device.callFunction('set_hour', $('#hour').text(), function(err, data) {
+            if (err) {
+                console.log('An error occurred:', err);
+            } else {
+                console.log('Function called succesfully:', data);
+                $('#hour').text(data.return_value);
+            }
+        });
+    }, 2000, {leading: false}));
+
+    $('#minute').on('input', _.throttle(function () {
+        device.callFunction('set_minute', $('#minute').text(), function(err, data) {
+            if (err) {
+                console.log('An error occurred:', err);
+            } else {
+                console.log('Function called succesfully:', data);
+                $('#minute').text(data.return_value);
+            }
+        });
+    }, 2000, {leading: false}));
 
     $('#settings').show();
 }
@@ -60,15 +82,12 @@ function setupActions(device) {
         });
     });
 
-    $('#stop_fading').click(function () {
-        device.callFunction('stop_fading', null, function(err, data) {
+    $('#reset').click(function () {
+        device.callFunction('reset', null, function(err, data) {
             if (err) {
                 console.log('An error occurred:', err);
             } else {
                 console.log('Function called succesfully:', data);
-                if (data.return_value == -1) {
-                    alert('Error stopping fade: already stopped fading.');
-                }
                 getSettings(device);
             }
         });
@@ -76,10 +95,6 @@ function setupActions(device) {
 
     $('#update').click(function () {
         getSettings(device);
-    });
-
-    $('#hour').change(function () {
-        alert('he');
     });
 
     $('#actions').show();
