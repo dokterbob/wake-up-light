@@ -52,6 +52,9 @@ function setupActions(device) {
                 console.log('An error occurred:', err);
             } else {
                 console.log('Function called succesfully:', data);
+                if (data.return_value == -1) {
+                    alert('Error starting fade: already fading.');
+                }
                 getSettings(device);
             }
         });
@@ -63,45 +66,72 @@ function setupActions(device) {
                 console.log('An error occurred:', err);
             } else {
                 console.log('Function called succesfully:', data);
+                if (data.return_value == -1) {
+                    alert('Error stopping fade: already stopped fading.');
+                }
                 getSettings(device);
             }
         });
     });
 
+    $('#update').click(function () {
+        getSettings(device);
+    });
+
     $('#actions').show();
 }
 
+function setupDevice(device) {
+    // Peform setup for device
+    getSettings(device);
+    setupActions(device);
+}
+
 $(function () {
-    sparkLogin(function(data) {
-        // Login feedback
-        $('#spark-login').hide();
+    // Attempt login using stored access token
+    var access_token = window.localStorage['access_token'];
 
-        console.log(data);
+    if (access_token) {
+        console.log('Logging in using access token:', access_token);
 
-        // Get devices
-        var devicesPr = spark.listDevices();
+        // Weird; in the docs this should be access_token
+        spark.login({accessToken: access_token});
+    } else {
+        // Display login button
+        console.log('Rendering login button');
 
-        devicesPr.then(
-            function(devices){
-                console.log('Devices: ', devices);
+        sparkLogin(function (data) {
+            console.log('Logged in:', data);
 
-                var device = devices[0];
+            // Hide login button
+            $('#spark-login').hide();
 
-                console.log('Device name: ' + device.name);
-                console.log('- connected?: ' + device.connected);
-                console.log('- variables: ' + device.variables);
-                console.log('- functions: ' + device.functions);
-                console.log('- version: ' + device.version);
-                console.log('- requires upgrade?: ' + device.requiresUpgrade);
-
-                getSettings(device);
-                setupActions();
-
-            },
-            function(err) {
-                console.log('List devices call failed: ', err);
-            }
-        );
-    });
+            // Store access token
+            window.localStorage['access_token'] = data.access_token;
+        });
+    }
 });
 
+spark.on('login', function() {
+    var devicesPr = spark.listDevices();
+
+    devicesPr.then(
+        function(devices){
+            console.log('Devices: ', devices);
+
+            var device = devices[0];
+
+            console.log('Device name: ' + device.name);
+            console.log('- connected?: ' + device.connected);
+            console.log('- variables: ' + device.variables);
+            console.log('- functions: ' + device.functions);
+            console.log('- version: ' + device.version);
+            console.log('- requires upgrade?: ' + device.requiresUpgrade);
+
+            setupDevice(device);
+        },
+        function(err) {
+            console.log('List devices call failed: ', err);
+        }
+    );
+});
