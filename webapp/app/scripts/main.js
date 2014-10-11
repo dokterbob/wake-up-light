@@ -78,6 +78,10 @@ function setupActions(device) {
         getSettings(device);
     });
 
+    $('#hour').change(function () {
+        alert('he');
+    });
+
     $('#actions').show();
 }
 

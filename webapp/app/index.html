@@ -28,10 +28,8 @@
           <h1>Wakup Light</h1>
 
             <div id="settings">
-              <p>Current values:</p>
-
               <ul>
-                <li>Time: <span id="hour"></span>:<span id="minute"></span></li>
+                <li>Time: <span id="hour" contenteditable></span>:<span id="minute" contenteditable></span></li>
                 <li>Fading: <span id="fading"></span></li>
                 <li>Duration: <span id="duration"></span> minute(s)</li>
               </ul>
@@ -41,6 +39,10 @@
                 <button id="start_fading">Start fading</button>
                 <button id="stop_fading">Stop fading</button>
                 <button id="update">Update</button>
+            </div>
+
+            <div id="update_time">
+
             </div>
 
             <div id="spark-login" />
