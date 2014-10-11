@@ -110,7 +110,7 @@ $(function () {
     // Attempt login using stored access token
     var access_token = window.localStorage['access_token'];
 
-    if (access_token) {
+    if (access_token != null) {
         console.log('Logging in using access token:', access_token);
 
         // Weird; in the docs this should be access_token
